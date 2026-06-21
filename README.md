@@ -1,791 +1,456 @@
-```
- ██▓███   ▒█████   ██▀███   ██ ▄█▀ ▄████▄   ██░ ██  ▒█████   ██▓███  
-▓██░  ██▒▒██▒  ██▒▓██ ▒ ██▒ ██▄█▒ ▒██▀ ▀█  ▓██░ ██▒▒██▒  ██▒▓██░  ██▒
-▓██░ ██▓▒▒██░  ██▒▓██ ░▄█ ▒▓███▄░ ▒▓█    ▄ ▒██▀▀██░▒██░  ██▒▓██░ ██▓▒
-▒██▄█▓▒ ▒▒██   ██░▒██▀▀█▄  ▓██ █▄ ▒▓▓▄ ▄██▒░▓█ ░██ ▒██   ██░▒██▄█▓▒ ▒
-▒██▒ ░  ░░ ████▓▒░░██▓ ▒██▒▒██▒ █▄▒ ▓███▀ ░░▓█▒░██▓░ ████▓▒░▒██▒ ░  ░
-▒▓▒░ ░  ░░ ▒░▒░▒░ ░ ▒▓ ░▒▓░▒ ▒▒ ▓▒░ ░▒ ▒  ░ ▒ ░░▒░▒░ ▒░▒░▒░ ▒▓▒░ ░  ░
-░▒ ░       ░ ▒ ▒░   ░▒ ░ ▒░░ ░▒ ▒░  ░  ▒    ▒ ░▒░ ░  ░ ▒ ▒░ ░▒ ░     
-░░       ░ ░ ░ ▒    ░░   ░ ░ ░░ ░ ░         ░  ░░ ░░ ░ ░ ▒  ░░       
-             ░ ░     ░     ░  ░   ░ ░       ░  ░  ░    ░ ░           
-                                  ░                                  
-                     [ CYD EDITION — ESP32-2432S028R ]
-```
+                      ┌─┐┌─┐┌─┐╷┌    
+                      ├─┘│ │├┬┘├┴┐   
+                      ╵  └─┘╵└╴╵ ╵   
+                         ┌┐╷       
+                         │└┤       
+                         ╵ ╵       
+                    ┌┐ ┌─╴┌─┐┌┐╷┌─┐
+                    ├┴┐├╴ ├─┤│└┤└─┐
+                    └─┘└─╴╵ ╵╵ ╵└─┘  
+                    
+               [ NM-RF-HAT EDITION — ESP32-2432S028R ]
 
-**Original project by [0ct0sec](https://github.com/0ct0sec/M5PORKCHOP)**
-**CYD port created by xom**
+Original project by 0ct0sec CYD port by xom (Xombi3) NM-RF-HAT adaptation: this fork
 
----
+
 
 --[ Contents
 
-    1  - What is this
-    2  - Credits
-    3  - Hardware
-    4  - Differences from M5PORKCHOP
-    5  - Installation
-         5.1 - Requirements
-         5.2 - Arduino IDE Setup
-         5.3 - Library Dependencies
-         5.4 - API Keys
-         5.5 - Flashing
-    6  - Pin Map
-    7  - SD Card Setup
-    8  - Modes
-         8.1  - IDLE / Home
-         8.2  - OINK MODE
-         8.3  - DO NO HAM
-         8.4  - SGT WARHOG
-         8.5  - SPECTRUM
-         8.6  - BACON MODE
-         8.7  - PIGGY BLUES
-         8.8  - PORK PATROL
-         8.9  - SWINE STATS
-         8.10 - CAPTURES
-         8.11 - BOUNTY
-         8.12 - BOAR BROS
-         8.13 - CHALLENGES
-         8.14 - ACHIEVEMENTS
-         8.15 - UNLOCKABLES
-         8.16 - DIAGNOSTICS
-         8.17 - SETTINGS
-         8.18 - WEB REMOTE
-    9  - Navigation
-    10 - GPS
-    11 - SD Card Saves
-    12 - WiGLE Upload
-    13 - WPA-SEC Upload
-    14 - Speaker & Sound
-    15 - XP & Leveling
-    16 - Challenges
-    17 - Achievements
-    18 - Change Log
+1  - What is this
 
+2  - Why this fork exists
+
+3  - Credits
+
+4  - Hardware
+
+5  - What changed in this fork
+
+6  - Installation
+
+     6.1 - Requirements
+
+     6.2 - Library + User_Setup.h
+
+     6.3 - Board settings
+
+     6.4 - API keys
+
+     6.5 - SD card
+
+     6.6 - Flashing
+
+7  - GPS on the NM-RF-HAT
+
+8  - Display orientation
+
+9  - Memory notes (why WARHOG used to crash)
+
+10 - Troubleshooting
+
+11 - Everything else
 
 --[ 1 - What is this
 
-    PORKCHOP CYD is a WiFi security research tool ported from the original
-    M5PORKCHOP project (M5Stack Cardputer) to the ESP32-2432S028R "Cheap
-    Yellow Display" — a $15 ESP32 board with a 2.8" ILI9341 TFT, resistive
-    touchscreen, SD card slot, speaker amp, and UART connector.
+This fork adapts xom's CYD port to run with the NM-RF-HAT companion
 
-    It does 802.11 passive scanning, deauth, handshake capture, PMKID
-    harvesting, wardriving with GPS, fake beacon injection, RF spectrum
-    analysis, Flock Safety ALPR camera detection, Axon bodycam detection,
-    WiGLE/WPA-SEC upload, and more.
+board, with the GNSS module connected to the hat's GPS header rather
 
-    Everything runs in a single .ino file. Flash and go.
+than wired to the bare CYD UART connector.
 
-    This is a research and educational tool. Use it only on networks and in
-    areas where you have explicit permission. Laws regarding WiFi monitoring,
-    packet injection, and surveillance detection vary by jurisdiction.
+Use it only on networks and in areas where you have explicit permission.
 
+Laws on WiFi monitoring, packet injection, and surveillance detection
 
---[ 2 - Credits
+vary by jurisdiction. This is a research and educational tool.
 
-    Original project:
+--[ 2 - Why this fork exists
 
-        M5PORKCHOP by 0ct0sec
-        https://github.com/0ct0sec/M5PORKCHOP
+The upstream CYD port (Xombi3/Porkchop-cyd-Port) expects the GPS module
 
-        All core WiFi attack modes, game systems, XP system, challenge
-        system, achievement system, mood/avatar system, lore, and the pig
-        himself are the original work of 0ct0sec. This port exists because
-        the original is excellent and the CYD is cheap. Star the original.
+on GPIO 3 — the wiring you get when you solder a GPS straight to the
 
-    CYD port:
+CYD's 4-pin UART connector.
 
-        Created by xom
+The NM-RF-HAT routes its GNSS header differently: GPS data arrives on
 
-        Hardware adaptation for ESP32-2432S028R, ILI9341/XPT2046 display
-        and touch integration, single-file Arduino port, SPI/pin remapping,
-        SD card integration, GPS (ATGM336H) support, ledc-based SFX system,
-        zone-based touch navigation, WebUI implementation, WiGLE/WPA-SEC
-        HTTPS upload, ISR-safe promiscuous mode, WDT crash resolution,
-        PORK PATROL surveillance detection (Flock Safety ALPR + Axon
-        bodycams), and all CYD-specific adaptations.
+GPIO 1, not GPIO 3. Flashing the stock port with a hat-mounted GPS gives
 
-    Surveillance detection research:
+you zero satellites forever, because the firmware is listening on the
 
-        deflock.me — crowdsourced ALPR camera location and detection data
-        flock-you by colonelpanichacks — Flock Safety detection methodology
-        WiGLE / vertex.link — Axon OUI and bodycam SSID research
-        DeFlock project (FoggedLens) — detection pattern foundations
+wrong pin.
 
-    Libraries:
+This fork moves the GPS to the pin the hat actually uses, fixes a couple
 
-        TFT_eSPI            Bodmer
-        XPT2046_Touchscreen Paul Stoffregen
-        TinyGPS++           Mikal Hart
-        ESP32 Arduino Core  Espressif Systems
+of CYD/hat-specific issues that surfaced along the way (display config,
 
+orientation, and a memory-fragmentation crash in WARHOG), and documents
 
---[ 3 - Hardware
+all of it so you don't have to rediscover it.
 
-    Required:
+--[ 3 - Credits
 
-        ESP32-2432S028R ("Cheap Yellow Display")
-        ~$15 on AliExpress / Amazon / Elegoo store
+Original M5PORKCHOP ............ 0ct0sec
 
-    Tested on:
+    https://github.com/0ct0sec/M5PORKCHOP
 
-        Elegoo ESP32-32E 2.8" 240x320
-        ILI9341 display, XPT2046 touch, NS4168 speaker amp
+    All core attack modes, the XP/challenge/achievement systems, the
 
-    Optional:
+    mood/avatar system, the lore, and the pig himself.
 
-        MicroSD card (FAT32, any size, Class 10+ recommended)
-        Passive 8Ω speaker (JST connector on back)
-        PAM8403 amplifier module (~$2) for louder audio
-        ATGM336H GPS module (connects to UART connector on back)
+CYD port ....................... xom (Xombi3)
 
+    https://github.com/Xombi3/Porkchop-cyd-Port
 
---[ 4 - Differences from M5PORKCHOP
+    ESP32-2432S028R hardware adaptation, ILI9341/XPT2046 display + touch,
 
-    The CYD has no keyboard, no battery IC, and a different display/touch
-    configuration. The following have been adapted or changed:
+    single-file Arduino port, SD/SFX/WebUI, PORK PATROL, the works.
 
-    +-----------------------------+------------------------------------------+
-    | Feature                     | Status                                   |
-    +-----------------------------+------------------------------------------+
-    | All core WiFi modes         | PORTED — fully working                   |
-    | Achievements (46 total)     | PORTED — fully working                   |
-    | XP / leveling system        | PORTED — fully working                   |
-    | Challenges system           | PORTED — fully working                   |
-    | Mood / avatar system        | PORTED — fully working                   |
-    | SD card saves               | PORTED — .22000 + WiGLE CSV             |
-    | WiGLE upload                | PORTED — HTTPS POST from CAPTURES       |
-    | WPA-SEC upload              | PORTED — HTTPS POST from CAPTURES       |
-    | Boar Bros / PigSync         | PORTED — ESP-NOW peer sync              |
-    | Unlockables                 | PORTED — SHA256 phrase verification     |
-    | Speaker / SFX               | PORTED — ledc PWM, 25 sounds            |
-    | GPS wardriving              | PORTED — ATGM336H via UART connector    |
-    | Web Remote                  | PORTED — AP mode HTTP server            |
-    | PORK PATROL                 | NEW — Flock ALPR + Axon bodycam detect  |
-    | Keyboard text entry         | NOT PORTED — no keyboard on CYD         |
-    |                             | (API keys set in source before flash)   |
-    | PIGGY BLUES                 | STUB — BLE stack exceeds RAM budget     |
-    | Charging screen             | NOT PORTED — CYD has no battery IC     |
-    | Crash viewer                | NOT PORTED — low value on CYD          |
-    | SD format tool              | NOT PORTED — format card before use    |
-    | Stress test                 | NOT PORTED — dev tool                  |
-    +-----------------------------+------------------------------------------+
+NM-RF-HAT adaptation ........... this fork
 
+    GPS repinned to the hat's GNSS header (GPIO 1), serial/UART0 pin
 
---[ 5 - Installation
+    arbitration, CYD User_Setup.h, 180° display+touch orientation,
 
+    8bpp sprite memory fix for WARHOG stability.
 
-----[ 5.1 - Requirements
+Surveillance research .......... deflock.me, flock-you
 
-    Arduino IDE 2.x
-    ESP32 Arduino Core 3.3.7 by Espressif
-    USB driver for CH340 or CP2102 (board dependent)
-    MicroSD card formatted as FAT32
+                                 (colonelpanichacks), WiGLE OUI research
 
+Libraries ...................... TFT_eSPI (Bodmer),
 
-----[ 5.2 - Arduino IDE Setup
+                                 XPT2046_Touchscreen (Paul Stoffregen),
 
-    1. File → Preferences → Additional Boards Manager URLs:
-       https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+                                 TinyGPS++ (Mikal Hart),
 
-    2. Tools → Board → Boards Manager → search "esp32" → install Espressif
+                                 ESP32 Arduino Core (Espressif)
 
-    3. Select: ESP32 Dev Module
+Hat hardware ................... NM-RF-HAT by RockBase
 
-    Board settings:
+                                 https://github.com/RockBase-iot/NM-RF-HAT
 
-        Board:              ESP32 Dev Module
-        Upload Speed:       921600
-        CPU Frequency:      240MHz
-        Flash Frequency:    80MHz
-        Flash Mode:         DIO
-        Flash Size:         4MB (32Mb)
-        Partition Scheme:   Default 4MB with spiffs
-        PSRAM:              Disabled
+--[ 4 - Hardware
 
+Required:
 
-----[ 5.3 - Library Dependencies
+    ESP32-2432S028R  ("Cheap Yellow Display", the R / resistive version)
 
-    Install via Library Manager (Tools → Manage Libraries):
+    NM-RF-HAT companion board
 
-        TFT_eSPI                by Bodmer
-        XPT2046_Touchscreen     by Paul Stoffregen
-        TinyGPS++               by Mikal Hart  (for GPS wardriving)
+    GNSS module for the hat's GPS header
 
-    Copy User_Setup.h into your TFT_eSPI library folder, replacing the
-    existing one. This sets the correct pin config for the CYD variant.
+Note on CYD variant:
 
-    The following are included in the ESP32 Arduino Core (no install):
+    Get the -R (resistive touch) board, not the -C (capacitive). The
 
-        WiFi, WiFiClientSecure, SD, SPI, Preferences, SPIFFS,
-        esp_wifi, lwip/sockets, mbedtls/base64
+    pin map and touch driver in this firmware are for the R variant.
 
+Note on the hat:
 
-----[ 5.4 - API Keys
+    GPS is UART, so it is independent of the hat's RF DIP switch. The
 
-    Open PorkChop_CYD.ino and search for:
+    switch only matters for the SPI-shared RF modules (CC1101 / nRF24 /
 
-        PASTE YOUR API KEYS HERE
+    PN532). For GPS-only use, just don't enable an RF module that would
 
-    You will find three lines around line 196:
+    fight the bus.
 
-        char wigleApiName[48]  = "";   // paste WiGLE account name here
-        char wigleApiToken[48] = "";   // paste WiGLE API token here
-        char wpasecKey[48]     = "";   // paste WPA-SEC key here
+--[ 5 - What changed in this fork
 
-    Paste your keys between the quotes, save, and flash.
-    Keys survive reflash (stored in NVS).
++----------------------------+-------------------------------------------+
 
-    To get your keys:
+| Change                     | Why                                       |
 
-        WiGLE:   wigle.net → Account → API → show token
-        WPA-SEC: wpa-sec.stanev.org → ?show_key after registering
++----------------------------+-------------------------------------------+
 
+| GPS_RX_PIN  3 -> 1         | NM-RF-HAT feeds GPS NMEA into GPIO 1, not |
 
-----[ 5.5 - Flashing
+|                            | GPIO 3. This is THE core fix.             |
 
-    1. Place PorkChop_CYD.ino and User_Setup.h in a folder named
-       PorkChop_CYD/
-    2. Open PorkChop_CYD.ino in Arduino IDE
-    3. Insert FAT32-formatted SD card with /captures and /wigle folders
-    4. Connect CYD via USB, select correct COM port
-    5. Click Upload
-    6. First boot: pig appears, boot sound plays (if speaker connected)
+| Serial/UART0 pin handling  | GPIO 1 is also UART0 TX. setup() frees it |
 
+|                            | so Serial2 can read GPS on it. (Trade:    |
 
---[ 6 - Pin Map
+|                            | USB debug TEXT output goes quiet once GPS |
 
-    Display (ILI9341) — HSPI:
+|                            | claims the pin — see section 7.)          |
 
-        MOSI    GPIO 13
-        MISO    GPIO 12
-        CLK     GPIO 14
-        CS      GPIO 15
-        DC      GPIO 2
-        BL      GPIO 21
+| Sprite 16bpp -> 8bpp       | The 320x160 16bpp sprite ate ~102KB in    |
 
-    Touch (XPT2046) — VSPI:
+|                            | one block and fragmented the heap until   |
 
-        CLK     GPIO 25
-        MISO    GPIO 39
-        MOSI    GPIO 32
-        CS      GPIO 33
-        IRQ     GPIO 36
+|                            | WARHOG abort()ed. 8bpp halves it (~51KB)  |
 
-    SD Card — VSPI default:
+|                            | and the crash is gone. (See section 9.)   |
 
-        CLK     GPIO 18
-        MISO    GPIO 19
-        MOSI    GPIO 23
-        CS      GPIO 5
+| setRotation(1) -> (3)      | Display + touch flipped 180° for the      |
 
-    Speaker (NS4168 amp):
+|                            | NM-RF-HAT mounting. Both calls changed so |
 
-        Signal  GPIO 26   ← DO NOT reassign
+|                            | touch zones aren't mirrored.              |
 
-    GPS (ATGM336H via UART connector):
+| CYD User_Setup.h provided  | Stock TFT_eSPI ships an ST7735 config.    |
 
-        RX      GPIO 3    ← CYD UART connector RXD pin
-        TX      not used
+|                            | The CYD needs ILI9341 on the right pins   |
 
-    RGB LED:
+|                            | or you get a blank/garbled screen.        |
 
-        R       GPIO 4
-        G       GPIO 16
-        B       GPIO 17
++----------------------------+-------------------------------------------+
 
-    UART Connector (back of board):
+--[ 6 - Installation
 
-        5V  |  GND  |  TXD  |  RXD
-        ↑ power GPS here    ↑ GPS TX wire goes here
+----[ 6.1 - Requirements
 
-    CN1 Connector (back of board):
+Arduino IDE 2.x
 
-        3.3V  |  GPIO 27  |  GPIO 22  |  GND
+ESP32 Arduino Core by Espressif (3.x)
 
-    CRITICAL: GPIO 26 = speaker only. Never reassign.
-    CRITICAL: GPIO 25 = touch CLK. Never drive as output.
-    CRITICAL: SD CS = GPIO 5 only.
+USB driver for CH340 or CP2102 (board dependent)
 
+MicroSD card formatted FAT32
 
---[ 7 - SD Card Setup
+----[ 6.2 - Library + User_Setup.h
 
-    Format card as FAT32 before first use.
+Install via Library Manager:
 
-    Create these folders on the card:
+    TFT_eSPI             by Bodmer
 
-        /captures/    ← handshake .22000 files saved here
-        /wigle/       ← wardriving .csv files saved here
+    XPT2046_Touchscreen  by Paul Stoffregen
 
-    The firmware creates these directories automatically if they don't
-    exist, but creating them manually avoids the first-save delay.
+    TinyGPS++            by Mikal Hart
 
-    Files are named automatically:
+CRITICAL: copy this repo's User_Setup.h into the TFT_eSPI library
 
-        /captures/SSID_BSSID.22000      hashcat WPA format
-        /captures/SSID_BSSID.16800      PMKID-only format
-        /wigle/wardrive_XXXXXX.csv      WiGLE wardriving CSV
+folder, replacing the one that ships with it:
 
+    <Arduino sketchbook>/libraries/TFT_eSPI/User_Setup.h
 
---[ 8 - Modes
+TFT_eSPI only reads its config from inside its OWN folder. Leaving
 
+User_Setup.h next to the .ino does nothing. The stock file is set up
 
-----[ 8.1 - IDLE / Home
+for an ST7735 display — if you skip this step you get a blank or
 
-    The pig lives here. Mood shifts with network activity.
-    Status bar shows mode, heap, scan count, XP level.
+garbled screen even though the firmware is booting fine.
 
-    Tap:  open menu
-    Hold: cycle theme
+----[ 6.3 - Board settings
 
+Board:              ESP32 Dev Module
 
-----[ 8.2 - OINK MODE
+Upload Speed:       921600
 
-    Active deauth + EAPOL handshake capture + PMKID harvest.
+Flash Size:         4MB (32Mb)
 
-    Scans for WPA2 targets, sends deauth frames to disconnect clients,
-    captures 4-way handshake when they reconnect. Also captures PMKID
-    from EAPOL M1 without requiring a client to be present.
+Partition Scheme:   Default 4MB with spiffs
 
-    Captures save automatically to /captures/ on SD card.
+PSRAM:              Disabled
 
-    Note: promiscuous filter set to DATA-only during OINK to prevent
-    WiFi driver watchdog timeouts in dense RF environments.
+----[ 6.4 - API keys
 
-    Bottom bar tap: exit
-    Hold: stop + back to IDLE
+Open PorkChop_CYD.ino, search for "PASTE YOUR API KEYS HERE"
 
+(around line 200), and fill in between the quotes:
 
-----[ 8.3 - DO NO HAM
+    char wigleApiName[48]  = "";   // WiGLE "API Name"  (not your login)
 
-    Passive monitoring only. Zero transmission.
+    char wigleApiToken[48] = "";   // WiGLE "API Token"
 
-    Sniffs 802.11 management and data frames. Tracks networks,
-    clients, handshakes, PMKIDs. No deauth, no injection.
+    char wpasecKey[48]     = "";   // WPA-SEC key (optional, separate site)
 
-    Bottom bar tap: exit
-    Hold: back to IDLE
+WiGLE: wigle.net -> Account -> use the API Name + API Token fields.
 
+Do NOT paste the "Encoded for use" / Authorization string — the
 
-----[ 8.4 - SGT WARHOG
+firmware base64-encodes the name:token pair itself. WPA-SEC is a
 
-    Wardriving mode with GPS coordinate logging.
+different service (wpa-sec.stanev.org); leave it "" if unused.
 
-    Scans and logs all visible networks with RSSI, encryption,
-    channel, BSSID, and GPS coordinates (if fix available).
-    Saves WiGLE-compatible CSV to /wigle/ on exit.
+Keys are stored in NVS and survive reflashing.
 
-    GPS fix shown in status bar as GPS:FIX or satellite count.
-    With GPS fix, each network entry gets real lat/lon/altitude.
-    Without fix, coordinates are 0.000000.
+----[ 6.5 - SD card
 
-    Bottom bar tap: exit + save CSV
-    Hold: save + back to IDLE
+FAT32 only (not exFAT/NTFS). Cards >32GB need a third-party FAT32
 
+formatter. The firmware auto-creates these at the card root on first
 
-----[ 8.5 - SPECTRUM
+save, but you can pre-make them:
 
-    RF channel utilization visualizer.
+    /captures    handshake .22000 / PMKID .16800 files
 
-    Live bar graph of signal strength per 2.4GHz channel (1-13).
-    Shows channel congestion and interference sources.
+    /wigle       wardriving .csv files
 
-    Bottom bar tap: exit
-    Hold: back to IDLE
+    /logs        session text logs
 
+Insert the card before power-on.
 
-----[ 8.6 - BACON MODE
+----[ 6.6 - Flashing
 
-    Fake beacon injection.
+1. Put PorkChop_CYD.ino in a folder named PorkChop_CYD (the folder name
 
-    Broadcasts 802.11 beacon frames with spoofed SSIDs fingerprinted
-    from nearby access points. Tap bottom zones to cycle beacon rate.
+   must match the .ino name).
 
-    Bottom bar tap: exit
-    Hold: stop + back to IDLE
+2. Open it in Arduino IDE, select the correct COM port.
 
+3. Upload. First compile is slow (a few minutes) — that's normal.
 
-----[ 8.7 - PIGGY BLUES
+4. If it stalls on "Connecting....", hold the BOOT button as upload
 
-    BLE advertisement spam — stubbed on CYD.
+   starts, release at "Writing at...".
 
-    The BLE stack requires ~60KB contiguous RAM which cannot coexist
-    with the display sprite and WiFi stack on the CYD's 320KB heap.
-    Mode displays a message explaining the constraint.
+Confirmation: on a good flash the serial monitor prints
 
-    Hardware limitation. Cannot be resolved without reducing other
-    features.
+    [DISPLAY] Sprite 320x160 8bpp OK
 
+and the pig appears on screen.
 
-----[ 8.8 - PORK PATROL
+--[ 7 - GPS on the NM-RF-HAT
 
-    Surveillance camera detection. The pig goes undercover.
+Module:      GNSS module on the NM-RF-HAT GPS header (NMEA, 9600 baud)
 
-    Passively scans the WiFi network list for known signatures of:
+ESP32 pin:   GPIO 1   (the hat routes GPS data here, set as GPS_RX_PIN)
 
-        [CAM] Flock Safety ALPR cameras
-              — 20 known OUI prefixes from deflock.me dataset
-              — SSID patterns: flock, fs ext, pigvision, penguin,
-                flockca
+THE GPIO 1 QUIRK
 
-        [BWC] Axon / Motorola body-worn cameras
-              — Axon OUI 00:25:DF (confirmed bodycam prefix)
-              — SSID patterns: axon, bwcviewer, evidence, taser,
-                motorola bwc, vievu, v300, v500, ibr
+    GPIO 1 is also the ESP32's UART0 TX — the same pin the USB serial
 
-    Display shows FLOCK:X BODYCAM:Y TOTAL:Z when devices spotted.
-    Each detection triggers an alert sound and logs to serial with
-    GPS coordinates if a fix is available.
+    console transmits on. The firmware frees GPIO 1 from UART0 so Serial2
 
-    Detection uses existing passive scan data — zero extra transmission.
-    Works alongside any other mode that keeps NetworkRecon running.
+    can read GPS on it. Consequence: once GPS is active, USB debug TEXT
 
-    Detection signatures sourced from deflock.me, flock-you
-    (colonelpanichacks), and WiGLE OUI research (vertex.link).
+    OUTPUT stops (you'll see boot lines, then the serial monitor fills
 
-    Bottom bar tap: exit
-    Hold: stop + back to IDLE
+    with NMEA-looking garbage — that "garbage" IS the GPS working).
 
+    Serial command INPUT still works on GPIO 3, so set API keys in source
 
-----[ 8.9 - SWINE STATS
+    (section 6.4) rather than typing them blind. To get a clean serial
 
-    Three-tab statistics screen.
+    log for debugging, flash with the GPS UNPLUGGED.
 
-    ST4TS:  Session captures, deauths, networks, runtime, XP.
-    B00STS: Active XP multipliers and mood buffs.
-    W1GL3:  WiGLE file count on SD card.
+GETTING A FIX
 
-    Tap: cycle tabs
-    Hold: back to IDLE
+    GPS does not lock indoors. Go outside with a clear view of the sky,
 
+    open SGT WARHOG, and give it 30-90s (longer on a cold start). The
 
-----[ 8.10 - CAPTURES
+    status bar moves from searching to showing speed/distance, and each
 
-    File management and upload screen.
+    logged network gets real lat/lon in the WiGLE CSV.
 
-    Shows handshake and PMKID counts saved to SD.
-    One-tap upload to WiGLE and WPA-SEC services.
+    If you get zero sats outdoors after several minutes and the module's
 
-        Bottom-left:  WPASEC — upload all .22000 from /captures/
-        Bottom-right: WIGLE  — upload all .csv from /wigle/
+    own fix LED is blinking, try changing GPS_BAUD from 9600 to 38400 —
 
-    Buttons show green when API keys are configured.
-    Requires WiFi connection to upload.
+    some GNSS modules ship at 38400.
 
-    Long hold: serial dump + SPIFFS save
+--[ 8 - Display orientation
 
+This fork sets rotation 3 (a 180° flip from the stock port) for the
 
-----[ 8.11 - BOUNTY
+NM-RF-HAT mounting, on BOTH the display and the touch layer:
 
-    Scored target tracking.
+    tft.setRotation(3);     // display
 
-    Tracks previously seen networks with bounty scores based on
-    encryption type, signal strength, and capture status.
+    touch.setRotation(3);   // touch (kept in sync so taps aren't mirrored)
 
-    Tap: select target
-    Hold: back to IDLE
+If your mount is the other way up, swap both back to 1. Rotation 1 and 3
 
+are the two landscape orientations; 0 and 2 are portrait. Always change
 
-----[ 8.12 - BOAR BROS
+the display and touch values together or your taps will land in the
 
-    ESP-NOW peer sync (PigSync protocol).
+wrong zones.
 
-    Discovers nearby PorkChop devices. Syncs capture counts,
-    bounty lists, XP events between units.
+--[ 9 - Memory notes (why WARHOG used to crash)
 
-    Tap: scan / select peer
-    Hold: back to IDLE
+Symptom: WARHOG ran for a bit, then the board rebooted. Serial showed:
 
+    [HEAP] free=37876 largest=92
 
-----[ 8.13 - CHALLENGES
+    abort() was called ...
 
-    Three active challenges: EASY / MEDIUM / HARD.
-    Refreshes each boot. Completing all three triggers bonus XP.
+Total free heap was fine (~37KB) but the largest CONTIGUOUS block was
 
-    Tap: view details
-    Hold: back to IDLE
+92 bytes — the heap was shredded. When a WARHOG scan finished and tried
 
+to allocate a normal buffer, nothing contiguous fit and the board
 
-----[ 8.14 - ACHIEVEMENTS
+abort()ed.
 
-    46 unlockable achievements across all activity types.
-    Triggered automatically. Earning one plays a fanfare and
-    bounces the pig.
+Cause: the 320x160 display sprite at 16bpp is one ~102KB contiguous
 
-    Tap: scroll list
-    Hold: back to IDLE
+allocation that never frees, leaving the rest of the heap fragmented.
 
+Fix: drop the sprite to 8bpp (256 colors). That halves it to ~51KB and
 
-----[ 8.15 - UNLOCKABLES
+returns ~50KB of contiguous space — exactly what WARHOG needs. Visually
 
-    Four secret phrases hidden in the lore.
-    Enter via Serial Monitor while in SETTINGS.
+near-identical for the pig UI.
 
-    Tap: select slot
-    Hold: back to IDLE
+    mainSprite.setColorDepth(8);   // was 16
 
+(For the record: releasing the BT controller memory was tried and did
 
-----[ 8.16 - DIAGNOSTICS
+nothing measurable on this board/core combo — the sprite depth was the
 
-    System health dashboard.
+real lever. Don't bother re-adding esp_bt_controller_mem_release here.)
 
-    Shows: free heap, largest block, heap pressure, WiFi state,
-    SD status, SPIFFS usage, GPS fix/satellites, uptime, XP.
+--[ 10 - Troubleshooting
 
-    Tap: toggle Knuth heap visualizer
-    Hold: back to IDLE
+Blank or garbled screen
 
+    User_Setup.h not copied into the TFT_eSPI library folder, or the
 
-----[ 8.17 - SETTINGS
+    stock ST7735 config is still in place. See 6.2.
 
-    Theme and sound configuration + API key entry.
+Screen upside-down or taps mirrored
 
-    Top half tap:    cycle color theme (15 themes)
-    Bottom half tap: toggle sound ON/OFF
-    Hold:            save all settings + back to IDLE
+    Orientation. See section 8 — change BOTH setRotation calls together.
 
-    API key entry (Serial Monitor at 115200 baud):
-        Navigate to SETTINGS on device
-        Type: WIGLE   — enter WiGLE API name and token
-        Type: WPASEC  — enter WPA-SEC API key
-        Type: CLEAR   — wipe all API credentials
+Zero GPS satellites
 
-    Easier method: paste keys directly in source before flashing.
-    See section 5.4.
+    1. Are you outdoors with sky view? It will not lock indoors.
 
+    2. Is GPS on GPIO 1 (GPS_RX_PIN = 1)? Required for the NM-RF-HAT.
 
-----[ 8.18 - WEB REMOTE
+    3. Still nothing after 5 min with the module's LED blinking?
 
-    Browser-based remote control over WiFi AP.
+       Try GPS_BAUD = 38400.
 
-    Tap to start: broadcasts "PORKCHOP" open WiFi AP.
-    Connect to PORKCHOP, browse to http://192.168.4.1
+WARHOG (or idle) reboots after a while
 
-    Features:
-        Live screen mirror (80x50 pixels, updates ~600ms)
-        Mode switching buttons
-        Touch zone simulation
-        WiGLE + WPA-SEC one-tap upload
+    Memory fragmentation. Confirm the sprite is 8bpp (section 9). Check
 
-    Tap again: stop AP, return to STA scanning.
-    Hold: back to IDLE.
+    the serial line after the sprite init — "largest:" should be well
 
-    Note: scanning pauses while Web Remote is active.
+    above the old ~17KB.
 
+Serial monitor shows only garbage
 
---[ 9 - Navigation
+    Expected when GPS is plugged in — that's NMEA on GPIO 1. Not a fault.
 
-    All navigation uses the touchscreen. No keyboard.
+    Flash with GPS unplugged if you need a readable serial log.
 
-    Menu uses zone-based taps:
+WiGLE upload returns 401
 
-        +---------------------------+
-        |   TOP THIRD — scroll up   |
-        +---------------------------+
-        |   MID THIRD — select      |
-        +---------------------------+
-        |   BOT THIRD — scroll down |
-        +---------------------------+
+    API Name and Token swapped, or the token was truncated past 47 chars
 
-    Top-left corner (any screen): back
-    Bottom bar tap (any mode):    exit mode → IDLE
-    Long press (1.5s):            hold action (save/exit/confirm)
+    (the buffers are [48]). Re-check section 6.4.
 
-    Menu shows 17 items. Scroll with top/bottom taps.
+--[ 11 - Everything else
 
+All the modes, navigation, capture formats, SD layout, WiGLE/WPA-SEC
 
---[ 10 - GPS
+upload, XP/challenges/achievements, sound, and PORK PATROL behave exactly
 
-    Module: ATGM336H (NMEA 0183, 9600 baud)
-    Connection: CYD UART connector (back of board)
+as in the upstream CYD port. See the original port's README for the full
 
-    Wiring:
+mode-by-mode reference:
 
-        ATGM336H 3V3  →  UART connector 5V  (module accepts 3.3-5V)
-        ATGM336H GND  →  UART connector GND
-        ATGM336H TX   →  UART connector RXD
-        ATGM336H RX   →  not connected
+    https://github.com/Xombi3/Porkchop-cyd-Port
 
-    GPS feeds real coordinates into WiGLE CSV during wardriving and
-    PORK PATROL detection logs.
+This fork only changes how the hardware is wired and a few CYD/hat
 
-    Status bar in WARHOG shows GPS:FIX when locked or satellite count
-    while searching. Cold fix typically takes 30-90 seconds outdoors.
+stability fixes — the pig is unchanged.
 
-    Note: A few garbage characters may appear at boot in Serial Monitor
-    due to GPIO 3 being shared between GPS NMEA output and UART0.
-    This is cosmetic only and does not affect operation.
-
-
---[ 11 - SD Card Saves
-
-    Handshakes (.22000 format, hashcat compatible):
-
-        /captures/SSID_BSSID.22000
-
-    PMKID-only captures (.16800 format):
-
-        /captures/SSID_BSSID.16800
-
-    WiGLE wardriving CSV:
-
-        /wigle/wardrive_XXXXXX.csv
-
-    Files save automatically:
-        Handshakes/PMKIDs: immediately on capture in OINK/DNH mode
-        WiGLE CSV: on exit from WARHOG mode
-
-    SD card must be FAT32. Folders /captures and /wigle must exist
-    at the root of the card (created automatically on first save
-    if missing).
-
-
---[ 12 - WiGLE Upload
-
-    Uploads wardriving CSV files to api.wigle.net.
-
-    Setup: paste WiGLE API name and token in source (section 5.4)
-    or enter via Serial Monitor in SETTINGS.
-
-    To upload:
-        CAPTURES screen → tap WIGLE button (bottom-right)
-        All CSV files in /wigle/ are uploaded via HTTPS POST
-
-    Requires WiFi connection. Button shows green when configured.
-
-
---[ 13 - WPA-SEC Upload
-
-    Uploads captured handshakes to wpa-sec.stanev.org for
-    distributed cracking against 10+ billion passwords.
-
-    Setup: paste WPA-SEC API key in source (section 5.4)
-    or enter via Serial Monitor in SETTINGS.
-
-    To upload:
-        CAPTURES screen → tap WPASEC button (bottom-left)
-        All .22000 files in /captures/ are uploaded via HTTPS POST
-
-    Button shows green when API key is configured.
-
-
---[ 14 - Speaker & Sound
-
-    Amp: NS4168 class-D on GPIO 26, AC-coupled input.
-    Signal: ledc PWM at 50% duty (true square wave) on 10-bit timer.
-
-    For louder output, wire a PAM8403 amplifier module between
-    GPIO 26 and your speaker. Search "PAM8403 audio amplifier module"
-    on Amazon (~$2). Gives 3W vs the built-in 0.5W.
-
-    PAM8403 wiring:
-
-        CYD GPIO 26  →  PAM8403 Left IN+
-        CYD GND      →  PAM8403 Left IN-
-        CYD 3.3V     →  PAM8403 VCC
-        CYD GND      →  PAM8403 GND
-        PAM8403 OUT+ →  Speaker +
-        PAM8403 OUT- →  Speaker -
-
-    25 sound events: BOOT, CLICK, HANDSHAKE, PMKID, DEAUTH,
-    ACHIEVEMENT, LEVEL_UP, CHALLENGE_COMPLETE, UPLOAD_OK, and more.
-
-    Sound toggle: SETTINGS → bottom half tap (ON/OFF).
-    Volume is always maximum (50% duty = loudest square wave through
-    the AC coupling cap).
-
-
---[ 15 - XP & Leveling
-
-    XP accumulates across all activity. Level is permanent (NVS).
-
-    Key XP events:
-
-        Network scan          +1 XP per unique network
-        Handshake capture     +50 XP
-        PMKID capture         +30 XP
-        Deauth sent           +2 XP
-        Challenge complete    +15 to +300 XP (by difficulty)
-        Achievement unlock    +100 XP
-        WiGLE upload          +25 XP
-        WPA-SEC upload        +25 XP
-
-    Current level and total XP shown in status bar and SWINE STATS.
-
-
---[ 16 - Challenges
-
-    Three challenges active at all times (EASY / MEDIUM / HARD).
-    Regenerate each boot with randomized targets and XP rewards.
-
-    Challenge types include: scan N nets, capture N handshakes,
-    capture N PMKIDs, send N deauths, find N open/hidden/WPA3 nets,
-    lurk silently, and more.
-
-    Completing all three in one session triggers CHALLENGE_SWEEP bonus.
-    Progress tracked automatically across all modes.
-
-
---[ 17 - Achievements
-
-    46 achievements unlock automatically during use.
-    Stored in NVS — survive reflashing.
-
-    Categories: network discovery, capture milestones, deauth
-    milestones, wardriving, XP milestones, social/upload,
-    and hidden triggers.
-
-    Earning an achievement plays a fanfare and displays the name
-    as a toast. The pig does a happy bounce.
-
-
---[ 18 - Change Log
-
-    CYD port created by xom — changes from original M5PORKCHOP:
-
-    Hardware:
-        Ported from M5Stack Cardputer to ESP32-2432S028R
-        ILI9341 TFT via HSPI (MOSI=13 MISO=12 CLK=14 CS=15 DC=2)
-        XPT2046 touch via VSPI (CLK=25 MISO=39 MOSI=32 CS=33 IRQ=36)
-        NS4168 speaker amp via GPIO 26 (ledc PWM, no tone())
-        ATGM336H GPS via UART connector (GPIO 3 RX, 9600 baud)
-        SD card via VSPI default (CLK=18 MISO=19 MOSI=23 CS=5)
-
-    Navigation:
-        Zone-based touch navigation (no keyboard)
-        Top/mid/bottom tap zones for menu scroll/select
-        Top-left corner = back on all screens
-        Bottom bar [X] button = exit any mode
-
-    New features:
-        PORK PATROL — Flock Safety ALPR + Axon bodycam detection
-            20 Flock OUI prefixes + 5 SSID patterns (deflock.me)
-            3 Axon OUI prefixes + 9 SSID patterns (bodycam WiFi)
-            GPS-tagged serial log on detection
-            Passive — runs on existing scan data, zero extra TX
-        WiGLE HTTPS upload directly from CAPTURES screen
-        WPA-SEC HTTPS upload directly from CAPTURES screen
-        Web Remote (HTTP AP server, browser screen mirror)
-        GPS coordinate logging in WiGLE wardriving CSV
-        GPS coordinate logging in PORK PATROL detections
-        ledc-based SFX system (25 sounds, no tone() crashes)
-        ISR-safe promiscuous mode (DATA-only filter during OINK)
-        API keys configurable in source before flashing
-
-    Bug fixes:
-        tone() crash on ESP32 core 3.x → replaced with ledc
-        WDT crash in OINK → beacon callbacks filtered at driver level
-        WiFi driver deadlock → volatile callback pointer, no mutex
-        Stack canary in WebUI → increased task stack
-        SD directory creation → parent dirs created automatically
-        NimBLE/sprite memory conflict → BLE stubbed, sprite preserved
-
-    Known limitations:
-        PIGGY BLUES unavailable — BLE stack (~60KB) + sprite (102KB)
-          + WiFi + SD exceeds 320KB heap. Hardware constraint.
-        Web Remote screen mirror occasionally stalls (Chrome issue)
-        GPS NMEA causes brief garbage at boot (GPIO 3 shared)
-        SPIFFS mount error at boot is cosmetic (formats on first use)
-
-
-==[EOF]==
