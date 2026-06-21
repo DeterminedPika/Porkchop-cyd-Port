@@ -7,7 +7,7 @@
 //   ILI9341 2.8" 320x240 TFT  HSPI: MOSI=13 CLK=14 CS=15 DC=2 RST=-1
 //   XPT2046 touch              VSPI: CLK=25 MISO=39 MOSI=32 CS=33 IRQ=36
 //   Backlight GPIO 21 HIGH     RGB LED active-LOW: R=4 G=16 B=17
-//   SD card CS=5               GPS: RX=22 TX=27 (Serial2, optional)
+//   SD card CS=5               GPS: RX=1 (Serial2) — NM-RF-HAT GNSS routing
 //
 // Arduino IDE Board: ESP32 Dev Module
 //   Partition: Huge APP (3MB No OTA / 1MB SPIFFS)
@@ -68,9 +68,11 @@
 #define TOUCH_MOSI_PIN 32
 
 // GPS (Serial2) - optional
-#define GPS_RX_PIN     3   // GPIO 3 = CYD UART connector RXD
-#define GPS_TX_PIN    -1   // not needed
-#define GPS_BAUD      9600
+// NM-RF-HAT routes the GNSS module's NMEA output onto GPIO 1.
+// (Bare-CYD UART-connector mods use GPIO 3; Bruce's generic default is 22.)
+#define GPS_RX_PIN     1   // GPIO 1 = NM-RF-HAT GPS data in  (was 3 on bare CYD)
+#define GPS_TX_PIN    -1   // not needed — Porkchop never transmits to the GPS
+#define GPS_BAUD      9600 // ATGM336H / most CYD GNSS modules. Try 38400 if no fix.
 
 // ============================================================
 // DISPLAY LAYOUT  (320x240 landscape — scaled from 240x135)
@@ -2072,10 +2074,15 @@ char lootSSID[33] = {0};
 
 void init() {
   // tft.begin() already called in setup() — do NOT call again
-  // Sprite: 16-bit color for proper theme colors
-  mainSprite.setColorDepth(16);
+  // Sprite color depth: 8bpp (256-color) instead of 16bpp halves the sprite's
+  // RAM from ~102KB to ~51KB in ONE contiguous block. That ~50KB is exactly the
+  // headroom WARHOG needs — at 16bpp the heap fragments to "largest=92" and
+  // post-scan allocations abort() the board. 256 colors looks near-identical for
+  // the pig UI. If you ever want richer gradients back, change 8 -> 16 (and
+  // accept the WARHOG crash risk returns unless memory is freed elsewhere).
+  mainSprite.setColorDepth(8);
   if (mainSprite.createSprite(DISPLAY_W, 160)) {
-    Serial.println("[DISPLAY] Sprite 320x160 16bpp OK");
+    Serial.println("[DISPLAY] Sprite 320x160 8bpp OK");
   } else {
     Serial.println("[DISPLAY] Sprite alloc failed — direct draw mode");
   }
@@ -9783,17 +9790,29 @@ bool isBusy() { return _busy; }
 // SETUP
 // ============================================================
 void setup() {
-#if GPS_ENABLED
-  // Claim GPIO 3 for GPS (Serial2) BEFORE Serial.begin() which also uses GPIO 3
-  // This prevents NMEA data leaking into the Serial monitor as garbage
-  Serial2.begin(GPS_BAUD, SERIAL_8N1, GPS_RX_PIN, -1);
-#endif
-  // Release classic BT (BR/EDR) — we only use BLE advertising.
-  // This recovers ~30KB and restores the contiguous block needed for the display sprite.
+  // USB debug console first so the boot banner is visible while flashing/testing.
   Serial.begin(115200);
   delay(100);
-  Serial.println("\n=== PORKCHOP CYD v6 STARTING ===");
+  Serial.println("\n=== PORKCHOP CYD v6 STARTING (NM-RF-HAT GPS build) ===");
   Serial.printf("[HEAP] startup: free=%u largest=%u\n", ESP.getFreeHeap(), heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
+
+#if GPS_ENABLED
+  // --- NM-RF-HAT GPS pin arbitration ---
+  // GPIO 1 is also UART0's TX pin (U0TXD), which is wired to the USB-serial
+  // chip. We don't want to rip UART0 off the pin entirely (that destabilized
+  // boot) — we just need GPIO 1 free to be reassigned as Serial2's RX input.
+  // Setting it to plain INPUT (no pulls) is enough: it stops UART0 driving it
+  // as an output, and Serial2.begin() then claims it via the GPIO matrix.
+  // USB debug TEXT OUTPUT still stops here once Serial2 takes the pin (the
+  // banner above is the last thing you'll see) — that part of the original
+  // note was correct. Serial command INPUT still works for WIGLE/WPASEC entry.
+  //
+  // Prefer full USB serial debug over the hat's GPS routing? Wire the GPS to
+  // GPIO 3 instead, set GPS_RX_PIN = 3 above, and remove the pinMode line below.
+  Serial.flush();
+  pinMode(GPS_RX_PIN, INPUT);
+  Serial2.begin(GPS_BAUD, SERIAL_8N1, GPS_RX_PIN, -1);   // GPS NMEA in on GPIO 1
+#endif
 
   // SD CS high (prevent SPI bus issues)
   pinMode(SD_CS_PIN,OUTPUT); digitalWrite(SD_CS_PIN,HIGH);
@@ -9807,7 +9826,7 @@ void setup() {
   pinMode(TFT_BL_PIN,OUTPUT); digitalWrite(TFT_BL_PIN,HIGH);
 
   // TFT
-  tft.begin(); tft.setRotation(1); tft.fillScreen(TFT_BLACK);
+  tft.begin(); tft.setRotation(3); tft.fillScreen(TFT_BLACK);  // rotation 3 = 180deg flip from stock port (NM-RF-HAT mounting)
 
   // SD init — use dedicated sdSPI instance on pins 18/19/23
   // Must be initialized BEFORE touchSPI.begin() which reconfigures the shared VSPI peripheral
@@ -9851,7 +9870,7 @@ void setup() {
   tft.fillScreen(colorBG());
   Display::showBootSplash();
   touchSPI.begin(TOUCH_CLK_PIN,TOUCH_MISO_PIN,TOUCH_MOSI_PIN,TOUCH_CS_PIN);
-  touch.begin(touchSPI); touch.setRotation(1);
+  touch.begin(touchSPI); touch.setRotation(3);  // match display rotation so touch zones aren't mirrored
 
   // Init subsystems
   SFX::init();
@@ -9866,7 +9885,7 @@ void setup() {
   SpiffsSave::loadAll();
 
 #if GPS_ENABLED
-  Serial.printf("[GPS] ATGM336H on RX=%d baud=%d\n", GPS_RX_PIN, GPS_BAUD);
+  Serial.printf("[GPS] NM-RF-HAT GNSS on RX=%d baud=%d\n", GPS_RX_PIN, GPS_BAUD);
 #endif
 
   bootTime=millis();
@@ -9904,7 +9923,12 @@ void setup() {
 // ============================================================
 void loop() {
 #if GPS_ENABLED
-  while(Serial2.available()) gps.encode(Serial2.read());
+  // Drain at most a bounded number of GPS bytes per loop pass. An unbounded
+  // `while(Serial2.available())` can churn through a large backlog (which builds
+  // up while a WiFi scan starves the loop), hogging the CPU long enough to trip
+  // the task watchdog and reset the board — that was the WARHOG crash. Capping
+  // it keeps each pass short; any leftover bytes are picked up next pass.
+  for (int _g = 0; _g < 64 && Serial2.available(); _g++) gps.encode(Serial2.read());
   if(gps.location.isValid()){
     gpsHasFix=true; gpsLat=gps.location.lat(); gpsLon=gps.location.lng();
     gpsSpeedKmh=gps.speed.kmph(); gpsSats=gps.satellites.value();
